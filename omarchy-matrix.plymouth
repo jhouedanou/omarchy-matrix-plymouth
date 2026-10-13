@@ -1,0 +1,11 @@
+[Plymouth Theme]
+Name=Omarchy Matrix
+Description=Omarchy splash screen with Matrix rain.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/omarchy-matrix
+ScriptFile=/usr/share/plymouth/themes/omarchy-matrix/omarchy-matrix.script
+ConsoleLogBackgroundColor=0x080C09
+MonospaceFont=Cantarell 11
+Font=Cantarell 11
