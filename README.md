@@ -1,147 +1,149 @@
-# Thème Plymouth omarchy-matrix
+# omarchy-matrix Plymouth theme
 
-Écran de démarrage et de déchiffrement LUKS pour [Omarchy](https://omarchy.org) : la pluie Matrix
-du screensaver Omarchy, avec le logo OMARCHY et la saisie du mot de passe du thème `omarchy`
-d'origine (cadenas, champ, puces, messages d'erreur).
+**English** · [Français](README.fr.md) · [Español](README.es.md)
 
-La pluie utilise 6 bandes de glyphes pré-rendues (48 sprites au plus), ce qui la garde fluide
-même au démarrage.
+Boot and LUKS decryption screen for [Omarchy](https://omarchy.org): the Matrix rain
+from the Omarchy screensaver, with the OMARCHY logo and the password prompt from the original
+`omarchy` theme (padlock, field, dots, error messages).
 
-## Prérequis
+The rain uses 6 pre-rendered glyph strips (48 sprites at most), which keeps it smooth
+even during boot.
 
-- Omarchy (Arch Linux + Hyprland), avec Plymouth actif. C'est le cas par défaut, surtout avec un disque chiffré.
+## Requirements
+
+- Omarchy (Arch Linux + Hyprland) with Plymouth enabled. This is the default, especially with an encrypted disk.
 - `sudo`.
-- Pour **régénérer** les images (facultatif) : ImageMagick (`magick`) et les polices Noto CJK.
-  Les PNG sont déjà fournis dans le dépôt, donc ce n'est pas nécessaire pour installer.
+- To **regenerate** the images (optional): ImageMagick (`magick`) and the Noto CJK fonts.
+  The PNGs are already in the repo, so you don't need them to install.
 
       omarchy pkg add imagemagick noto-fonts-cjk
 
 ## Installation
 
-1. Récupérer le dépôt :
+1. Clone the repo:
 
        git clone https://github.com/jhouedanou/omarchy-matrix-plymouth.git
        cd omarchy-matrix-plymouth
 
-2. *(Facultatif)* Reprendre les couleurs du thème Omarchy actif :
+2. *(Optional)* Use the colors of the active Omarchy theme:
 
        ./build.sh
 
-3. Installer et définir le thème par défaut (demande le mot de passe sudo) :
+3. Install and set as the default theme (asks for your sudo password):
 
        ./install.sh
 
-   Le script copie le thème dans `/usr/share/plymouth/themes/omarchy-matrix/`, le définit
-   par défaut et reconstruit l'image de boot : `limine-mkinitcpio` sur Omarchy (démarrage Limine),
-   sinon `plymouth-set-default-theme -R`.
+   The script copies the theme to `/usr/share/plymouth/themes/omarchy-matrix/`, sets it
+   as the default and rebuilds the boot image: `limine-mkinitcpio` on Omarchy (Limine boot),
+   otherwise `plymouth-set-default-theme -R`.
 
-4. Redémarrer. Le nouveau thème s'affiche à la demande du mot de passe LUKS.
+4. Reboot. The new theme shows up at the LUKS password prompt.
 
-## Tester sans redémarrer
+## Test without rebooting
 
-Hyprland occupe l'écran : il faut passer sur un vrai TTY (**Ctrl+Alt+F3**), se connecter, puis :
+Hyprland holds the screen, so you need to switch to a real TTY (**Ctrl+Alt+F3**), log in, then:
 
     sudo plymouthd
     sudo plymouth --show-splash
-    sudo plymouth ask-for-password --prompt="Test"     # tape un mot de passe, puis Entrée
-    sudo plymouth display-message --text="Mot de passe incorrect"
+    sudo plymouth ask-for-password --prompt="Test"     # type a password, then Enter
+    sudo plymouth display-message --text="Wrong password"
     sudo plymouth --quit
 
-Retour à la session graphique : **Ctrl+Alt+F1** (ou F2, selon la machine).
+Back to the graphical session: **Ctrl+Alt+F1** (or F2, depending on the machine).
 
 ## Configuration
 
-### Couleurs et logo
+### Colors and logo
 
-`build.sh` lit :
+`build.sh` reads:
 
-| Élément | Source par défaut | Variable pour la changer |
+| Element | Default source | Variable to change it |
 |---|---|---|
-| Couleurs | `~/.local/state/omarchy/current/theme/colors.toml` (thème actif) | `COLORS=` |
+| Colors | `~/.local/state/omarchy/current/theme/colors.toml` (active theme) | `COLORS=` |
 | Logo | `~/.config/omarchy/branding/screensaver.txt` | `LOGO_TXT=` |
-| Police des glyphes | Noto Sans CJK | `GLYPH_FONT=` |
-| Police du logo | Noto Sans Mono (sinon Adwaita Mono) | `LOGO_FONT=` |
+| Glyph font | Noto Sans CJK | `GLYPH_FONT=` |
+| Logo font | Noto Sans Mono (otherwise Adwaita Mono) | `LOGO_FONT=` |
 
-Sans `colors.toml`, il prend un vert Matrix. Les thèmes fournis sont dans `/usr/share/omarchy/themes/`,
-ceux installés à la main dans `~/.config/omarchy/themes/`. Exemple :
+Without `colors.toml`, it falls back to Matrix green. Bundled themes are in `/usr/share/omarchy/themes/`,
+manually installed ones in `~/.config/omarchy/themes/`. Example:
 
     COLORS=/usr/share/omarchy/themes/tokyo-night/colors.toml ./build.sh && ./install.sh
 
-Après un changement de thème Omarchy, relancer `./build.sh && ./install.sh` pour que l'écran de
-boot suive. Les glyphes sont tirés au hasard à chaque build.
+After changing the Omarchy theme, run `./build.sh && ./install.sh` again so the boot screen
+follows. Glyphs are picked at random on each build.
 
-### Pluie
+### Rain
 
-Dans `omarchy-matrix.script.in` (puis `./build.sh && ./install.sh`) :
+In `omarchy-matrix.script.in` (then `./build.sh && ./install.sh`):
 
-- `rain_max_drops` (48) : nombre maximal de colonnes. Baisser si l'animation saccade.
-- `rain_step` (2) : la pluie avance une image sur deux. `1` est plus fluide mais plus coûteux.
+- `rain_max_drops` (48): maximum number of columns. Lower it if the animation stutters.
+- `rain_step` (2): the rain moves every other frame. `1` is smoother but heavier.
 
-Ne modifie que les fichiers `.in` : `build.sh` réécrit `omarchy-matrix.script` et `.plymouth` à partir d'eux.
+Only edit the `.in` files: `build.sh` rewrites `omarchy-matrix.script` and `.plymouth` from them.
 
-## Désinstaller / revenir au thème d'origine
+## Uninstall / restore the original theme
 
     omarchy-refresh-plymouth
     sudo rm -rf /usr/share/plymouth/themes/omarchy-matrix
 
-## Fichiers
+## Files
 
-- `build.sh` : génère les PNG, `omarchy-matrix.script` et `omarchy-matrix.plymouth` depuis les `.in`.
-- `install.sh` : installe le thème et reconstruit l'image de boot.
-- `omarchy-matrix.script.in` / `.plymouth.in` : modèles (couleurs remplacées par `build.sh`).
-- `*.png` : images générées (bandes de pluie, logo, cadenas, champ, puces, barre de progression, voile).
+- `build.sh`: generates the PNGs, `omarchy-matrix.script` and `omarchy-matrix.plymouth` from the `.in` files.
+- `install.sh`: installs the theme and rebuilds the boot image.
+- `omarchy-matrix.script.in` / `.plymouth.in`: templates (colors filled in by `build.sh`).
+- `*.png`: generated images (rain strips, logo, padlock, field, dots, progress bar, overlay).
 
-## Dépannage
+## Troubleshooting
 
-- **`mkinitcpio: No presets found`** : normal sur Omarchy, qui démarre via Limine. `install.sh`
-  utilise `limine-mkinitcpio` à la place.
-- **Rien ne s'affiche au test** : le test doit se faire depuis un TTY, pas depuis un terminal Hyprland.
-- **Toujours l'ancien thème au boot** : vérifier `plymouth-set-default-theme` (doit afficher
-  `omarchy-matrix`), puis relancer `sudo limine-mkinitcpio`.
+- **`mkinitcpio: No presets found`**: normal on Omarchy, which boots through Limine. `install.sh`
+  uses `limine-mkinitcpio` instead.
+- **Nothing shows up during the test**: run the test from a TTY, not from a Hyprland terminal.
+- **Still the old theme at boot**: check `plymouth-set-default-theme` (it should print
+  `omarchy-matrix`), then run `sudo limine-mkinitcpio` again.
 
-## Ma config Omarchy
+## My Omarchy setup
 
-Le thème tourne sur [Omarchy](https://github.com/basecamp/omarchy) 4.0.4 (Quattro), avec ce qui suit.
+The theme runs on [Omarchy](https://github.com/basecamp/omarchy) 4.0.4 (Quattro), with the following.
 
-### Thèmes
+### Themes
 
-| Thème | Lien |
+| Theme | Link |
 |---|---|
-| **Matrix** (actif) : le film de 1999, base des couleurs de ce thème Plymouth | [BVisagie/omarchy-matrix-theme](https://github.com/BVisagie/omarchy-matrix-theme) |
-| Monokai : Monokai Pro à fort contraste | [bjarneo/omarchy-monokai-theme](https://github.com/bjarneo/omarchy-monokai-theme) |
+| **Matrix** (active): the 1999 film, the base for this Plymouth theme's colors | [BVisagie/omarchy-matrix-theme](https://github.com/BVisagie/omarchy-matrix-theme) |
+| Monokai: high-contrast Monokai Pro | [bjarneo/omarchy-monokai-theme](https://github.com/bjarneo/omarchy-monokai-theme) |
 
-### Plugins Omarchy
+### Omarchy plugins
 
-| Plugin | Rôle | Lien |
+| Plugin | What it does | Link |
 |---|---|---|
-| Plugin Manager | Gérer les plugins : activer, mettre à jour, installer depuis git, supprimer | [fross100/omaplug](https://github.com/fross100/omaplug) |
-| OmaStats | Moniteur système dans la barre (CPU, GPU, mémoire, disque, réseau, températures, batterie) | [crmne/omastats](https://github.com/crmne/omastats) |
-| Fan Monitor | Vitesse des ventilateurs et températures dans la barre | [elynch303/fan-monitor](https://github.com/elynch303/fan-monitor) |
-| Dev Stats | Grille de contributions GitHub / GitLab / Forgejo dans la barre | [qempexe/omarchy-dev-stats](https://github.com/qempexe/omarchy-dev-stats) |
-| lerd Glance | Sites, services et workers [lerd](https://github.com/lerd-env) dans la barre | [lerd-env/lerd-omarchy-glance](https://github.com/lerd-env/lerd-omarchy-glance) |
-| Power Menu | Bouton d'alimentation : verrouiller, déconnexion, veille, hibernation, redémarrage, arrêt | [alshareedah22/omarchy-power-menu](https://github.com/alshareedah22/omarchy-power-menu) |
-| omac | Navigation à la Mac : raccourcis ⌘, déplacement du curseur, ⌘W, gestes | [nchudleigh/omac](https://github.com/nchudleigh/omac) |
-| Switch Magic | Sélecteur visuel d'espaces de travail et de fenêtres, avec aperçus | [renanmt/switch-magic](https://github.com/renanmt/switch-magic) |
-| Keyboard Layout Switcher | Changement de disposition clavier et visualiseur de clavier | [jesusarchive/omarchy-keyboard-layout-switcher](https://github.com/jesusarchive/omarchy-keyboard-layout-switcher) |
-| Mouse | Vitesse, accélération et défilement naturel de la souris | [wouldja/omarchy-mouse](https://github.com/wouldja/omarchy-mouse) |
-| Cursor Accent | Curseur aux couleurs d'accent du thème actif | [SmoothPixels/cursor-accent](https://github.com/SmoothPixels/cursor-accent) |
-| Claude Strip | Bandeau en haut des terminaux qui font tourner Claude Code | [TaylorBurke/claude-strip](https://github.com/TaylorBurke/claude-strip) |
+| Plugin Manager | Manage plugins: enable, update, install from git, remove | [fross100/omaplug](https://github.com/fross100/omaplug) |
+| OmaStats | System monitor in the bar (CPU, GPU, memory, disk, network, temperatures, battery) | [crmne/omastats](https://github.com/crmne/omastats) |
+| Fan Monitor | Fan speeds and temperatures in the bar | [elynch303/fan-monitor](https://github.com/elynch303/fan-monitor) |
+| Dev Stats | GitHub / GitLab / Forgejo contribution grid in the bar | [qempexe/omarchy-dev-stats](https://github.com/qempexe/omarchy-dev-stats) |
+| lerd Glance | [lerd](https://github.com/lerd-env) sites, services and workers in the bar | [lerd-env/lerd-omarchy-glance](https://github.com/lerd-env/lerd-omarchy-glance) |
+| Power Menu | Power button: lock, log out, suspend, hibernate, reboot, shut down | [alshareedah22/omarchy-power-menu](https://github.com/alshareedah22/omarchy-power-menu) |
+| omac | Mac-style navigation: ⌘ shortcuts, cursor movement, ⌘W, gestures | [nchudleigh/omac](https://github.com/nchudleigh/omac) |
+| Switch Magic | Visual workspace and window switcher, with previews | [renanmt/switch-magic](https://github.com/renanmt/switch-magic) |
+| Keyboard Layout Switcher | Keyboard layout switching and keyboard viewer | [jesusarchive/omarchy-keyboard-layout-switcher](https://github.com/jesusarchive/omarchy-keyboard-layout-switcher) |
+| Mouse | Mouse speed, acceleration and natural scrolling | [wouldja/omarchy-mouse](https://github.com/wouldja/omarchy-mouse) |
+| Cursor Accent | Cursor in the active theme's accent colors | [SmoothPixels/cursor-accent](https://github.com/SmoothPixels/cursor-accent) |
+| Claude Strip | Banner at the top of terminals running Claude Code | [TaylorBurke/claude-strip](https://github.com/TaylorBurke/claude-strip) |
 
-### Outils
+### Tools
 
-| Outil | Rôle | Lien |
+| Tool | What it does | Link |
 |---|---|---|
-| Aether | Création de thèmes à partir du fond d'écran | [omacom/aether](https://github.com/omacom/aether) |
-| omafiles | Explorateur de fichiers au clavier pour Omarchy | [aloisdeniel/omafiles](https://github.com/aloisdeniel/omafiles) |
-| nwg-dock-hyprland | Dock, recoloré à chaque changement de thème | [nwg-piotr/nwg-dock-hyprland](https://github.com/nwg-piotr/nwg-dock-hyprland) |
-| omazed | Thème de Zed synchronisé avec Omarchy | [aps6/omazed](https://github.com/aps6/omazed) |
-| Voxtype | Dictée vocale (appuyer pour parler) | [voxtype.io](https://voxtype.io) |
-| tmux-resurrect + tmux-continuum | Sauvegarde et restauration automatique des sessions tmux | [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect), [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) |
+| Aether | Theme creation from the wallpaper | [omacom/aether](https://github.com/omacom/aether) |
+| omafiles | Keyboard-driven file explorer for Omarchy | [aloisdeniel/omafiles](https://github.com/aloisdeniel/omafiles) |
+| nwg-dock-hyprland | Dock, recolored on every theme change | [nwg-piotr/nwg-dock-hyprland](https://github.com/nwg-piotr/nwg-dock-hyprland) |
+| omazed | Zed theme synced with Omarchy | [aps6/omazed](https://github.com/aps6/omazed) |
+| Voxtype | Voice dictation (push to talk) | [voxtype.io](https://voxtype.io) |
+| tmux-resurrect + tmux-continuum | Automatic save and restore of tmux sessions | [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect), [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) |
 
-Terminaux : foot, Ghostty, Kitty, Alacritty. Shell : fish + [Starship](https://starship.rs). Éditeurs : Neovim ([LazyVim](https://www.lazyvim.org)), [Zed](https://zed.dev), VS Code.
+Terminals: foot, Ghostty, Kitty, Alacritty. Shell: fish + [Starship](https://starship.rs). Editors: Neovim ([LazyVim](https://www.lazyvim.org)), [Zed](https://zed.dev), VS Code.
 
 <details>
-<summary>Extensions VS Code (162)</summary>
+<summary>VS Code extensions (162)</summary>
 
 - [`aaaaronzhou.vscode-auto-light-dark-theme`](https://marketplace.visualstudio.com/items?itemName=aaaaronzhou.vscode-auto-light-dark-theme)
 - [`adrianwilczynski.terminal-commands`](https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.terminal-commands)
@@ -308,7 +310,7 @@ Terminaux : foot, Ghostty, Kitty, Alacritty. Shell : fish + [Starship](https://s
 
 </details>
 
-## Licence
+## License
 
-MIT, voir [LICENSE](LICENSE). La saisie du mot de passe et la barre de progression viennent du
-thème Plymouth d'[Omarchy](https://github.com/basecamp/omarchy) (MIT).
+MIT, see [LICENSE](LICENSE). The password prompt and the progress bar come from
+[Omarchy](https://github.com/basecamp/omarchy)'s Plymouth theme (MIT).
